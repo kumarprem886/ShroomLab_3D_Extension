@@ -21,7 +21,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
   });
 
-  // Inject dialog into the current page
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     files: ['content.js']
@@ -39,6 +38,11 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
                            .catch(e => sendResponse({ ok: false, error: e.message }));
     return true;
   }
+  if (msg.type === 'CREATE_CATEGORY') {
+    createCategory(msg.category).then(() => sendResponse({ ok: true }))
+                                .catch(e => sendResponse({ ok: false, error: e.message }));
+    return true;
+  }
 });
 
 // ── Fetch category list from index.html ───────────────────────────────
@@ -51,6 +55,55 @@ async function fetchCategories() {
   const m      = text.match(/const BADGE = \{([^}]+)\}/);
   if (!m) return [];
   return [...m[1].matchAll(/(\w+):'([^']+)'/g)].map(([, k, v]) => [k, v]);
+}
+
+// ── Create new category in both HTML files ────────────────────────────
+async function createCategory({ key, label, color }) {
+  const s = await getSettings();
+  if (!s.token) throw new Error('No GitHub token — click the 🍄 icon to set it up.');
+
+  const repo    = s.repo   || DEFAULT_REPO;
+  const branch  = s.branch || DEFAULT_BRANCH;
+  const headers = {
+    'Authorization': `token ${s.token}`,
+    'Accept':        'application/vnd.github+json',
+    'Content-Type':  'application/json'
+  };
+
+  for (const filename of ['index.html', 'catalogue.html']) {
+    const { sha, content: html } = await ghGet(filename, repo, branch, headers);
+
+    // Skip if already registered
+    if (html.includes(`${key}:'`) || html.includes(`${key}: '`)) continue;
+
+    let updated = html;
+
+    // 1. Badge CSS — insert before first </style>
+    updated = updated.replace(
+      /(<\/style>)/,
+      `    .badge-${key} { background: ${color}; color: #fff; }\n  $1`
+    );
+
+    // 2. Filter button — insert before halloween button
+    updated = updated.replace(
+      /(<button[^>]+data-cat="halloween"[^>]*>[\s\S]*?<\/button>)/,
+      `<button class="filter-btn" data-cat="${key}">${label} <span id="cnt-${key}"></span></button>\n    $1`
+    );
+
+    // 3. BADGE entry
+    updated = updated.replace(
+      /(const BADGE = \{)([^}]+)(\})/,
+      `$1$2, ${key}:'${label}'$3`
+    );
+
+    // 4. BADGE_CLASS entry
+    updated = updated.replace(
+      /(const BADGE_CLASS = \{)([^}]+)(\})/,
+      `$1$2, ${key}:'badge-${key}'$3`
+    );
+
+    await ghPut(filename, updated, sha, `Add category: ${label}`, repo, branch, headers);
+  }
 }
 
 // ── Push new product to products.js ───────────────────────────────────
@@ -66,17 +119,9 @@ async function addProduct(p) {
     'Content-Type':  'application/json'
   };
 
-  const getRes = await fetch(
-    `https://api.github.com/repos/${repo}/contents/products.js?ref=${branch}`,
-    { headers }
-  );
-  if (!getRes.ok) throw new Error((await getRes.json()).message);
+  const { sha, content } = await ghGet('products.js', repo, branch, headers);
 
-  const file    = await getRes.json();
-  const bytes   = Uint8Array.from(atob(file.content.replace(/\n/g, '')), c => c.charCodeAt(0));
-  let content   = new TextDecoder().decode(bytes);
-
-  const parts   = [
+  const parts = [
     `  {"title":${JSON.stringify(p.title)}`,
     `"price":"${p.price}"`,
     `"compare_at":""`,
@@ -84,27 +129,36 @@ async function addProduct(p) {
     p.isNew ? `"isNew":true` : null,
     `"image":${JSON.stringify(p.image)}}`
   ].filter(Boolean);
-  const entry = parts.join(',"');
 
-  content = content.replace(/\n?\];\s*$/, `,\n${entry}\n];`);
+  const updated = content.replace(/\n?\];\s*$/, `,\n${parts.join(',')}\n];`);
+  await ghPut('products.js', updated, sha, `Add: ${p.title}`, repo, branch, headers);
+}
 
-  const pushRes = await fetch(
-    `https://api.github.com/repos/${repo}/contents/products.js`,
+// ── GitHub API helpers ─────────────────────────────────────────────────
+async function ghGet(filename, repo, branch, headers) {
+  const res = await fetch(
+    `https://api.github.com/repos/${repo}/contents/${filename}?ref=${branch}`,
+    { headers }
+  );
+  if (!res.ok) throw new Error((await res.json()).message);
+  const file  = await res.json();
+  const bytes = Uint8Array.from(atob(file.content.replace(/\n/g, '')), c => c.charCodeAt(0));
+  return { sha: file.sha, content: new TextDecoder().decode(bytes) };
+}
+
+async function ghPut(filename, content, sha, message, repo, branch, headers) {
+  const res = await fetch(
+    `https://api.github.com/repos/${repo}/contents/${filename}`,
     {
       method: 'PUT',
       headers,
-      body: JSON.stringify({
-        message: `Add: ${p.title}`,
-        content: toBase64(content),
-        sha:     file.sha,
-        branch
-      })
+      body: JSON.stringify({ message, content: toBase64(content), sha, branch })
     }
   );
-  if (!pushRes.ok) throw new Error((await pushRes.json()).message);
+  if (!res.ok) throw new Error((await res.json()).message);
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────
+// ── Misc helpers ───────────────────────────────────────────────────────
 async function getSettings() {
   return new Promise(resolve =>
     chrome.storage.local.get('shroomlab_settings', d => resolve(d.shroomlab_settings || {}))
