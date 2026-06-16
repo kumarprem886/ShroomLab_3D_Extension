@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; width: 260px; background: #f0f7f4; color: #1b4332; }
+    .header {
+      background: linear-gradient(135deg, #1b4332, #2d6a4f);
+      color: white; padding: 14px 16px; text-align: center;
+    }
+    .header h1 { font-size: 1rem; font-weight: 700; }
+    .header p  { font-size: 0.72rem; opacity: 0.75; margin-top: 3px; }
+    .body { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .tip {
+      background: white; border-radius: 8px; padding: 11px;
+      font-size: 0.78rem; line-height: 1.55; color: #374151;
+      border-left: 3px solid #40916c;
+    }
+    button {
+      width: 100%; padding: 10px; border: none; border-radius: 8px;
+      font-size: 0.84rem; font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.88; }
+    .btn-primary { background: #40916c; color: white; }
+    .btn-secondary {
+      background: transparent; color: #40916c;
+      border: 1.5px solid #40916c;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🍄 ShroomLab 3D</h1>
+    <p>Product Importer</p>
+  </div>
+  <div class="body">
+    <div class="tip">
+      <strong>Right-click</strong> any product image on MakerWorld or any site → select <strong>"Add to ShroomLab 3D"</strong>.
+    </div>
+    <button class="btn-primary" id="btn-manual">➕ Add Product Manually</button>
+    <button class="btn-secondary" id="btn-settings">⚙️ Settings</button>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

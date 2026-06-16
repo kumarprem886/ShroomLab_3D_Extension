@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ShroomLab Extension — Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f7f4; color: #1b4332; padding: 28px; max-width: 480px; margin: 0 auto; }
+    h1 { font-size: 1.25rem; font-weight: 800; }
+    .sub { font-size: 0.8rem; color: #40916c; margin-top: 4px; margin-bottom: 24px; }
+    .card { background: white; border-radius: 14px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 16px; }
+    .card h2 { font-size: 0.9rem; font-weight: 700; margin-bottom: 16px; }
+    label { font-size: 0.72rem; font-weight: 600; color: #2d6a4f; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 5px; }
+    input {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid #c8e6c9; border-radius: 8px;
+      font-size: 0.85rem; font-family: inherit; color: #1b4332;
+      margin-bottom: 5px; outline: none;
+    }
+    input:focus { border-color: #40916c; }
+    .hint { font-size: 0.72rem; color: #6b7280; margin-bottom: 14px; }
+    .hint a { color: #2d6a4f; }
+    button {
+      background: linear-gradient(135deg, #40916c, #2d6a4f);
+      color: white; border: none; border-radius: 8px;
+      padding: 10px 24px; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+    }
+    .saved { font-size: 0.8rem; color: #065f46; font-weight: 600; margin-top: 10px; display: none; }
+    .steps { list-style: none; counter-reset: step; }
+    .steps li { counter-increment: step; display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.82rem; line-height: 1.5; }
+    .steps li::before {
+      content: counter(step);
+      min-width: 22px; height: 22px; background: #40916c; color: white;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍄 ShroomLab 3D Extension</h1>
+  <p class="sub">One-time setup — takes 2 minutes</p>
+
+  <div class="card">
+    <h2>⚙️ GitHub Settings</h2>
+    <label>GitHub Personal Access Token</label>
+    <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <p class="hint">Needs <strong>repo</strong> scope. <a href="https://github.com/settings/tokens/new?scopes=repo&description=ShroomLab+Extension" target="_blank">Click here to create one →</a></p>
+
+    <label>Repository</label>
+    <input type="text" id="repo" value="kumarprem886/ShroomLab_3D">
+    <p class="hint">Your GitHub repo (username/repo-name)</p>
+
+    <label>Branch</label>
+    <input type="text" id="branch" value="main">
+
+    <button onclick="saveSettings()">💾 Save Settings</button>
+    <p class="saved" id="saved-msg">✅ Settings saved!</p>
+  </div>
+
+  <div class="card">
+    <h2>📖 How to use</h2>
+    <ol class="steps">
+      <li>Save your GitHub token above (only once).</li>
+      <li>Go to MakerWorld, Printables, or any product site.</li>
+      <li>Right-click a product image.</li>
+      <li>Select <strong>"Add to ShroomLab 3D"</strong>.</li>
+      <li>Fill in the title and category, click <strong>Add</strong>.</li>
+      <li>Product goes live on your site in ~1 minute.</li>
+    </ol>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

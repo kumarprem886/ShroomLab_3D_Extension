@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Add to ShroomLab 3D</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f7f4; color: #1b4332; width: 440px; }
+
+    .header {
+      background: linear-gradient(135deg, #1b4332, #2d6a4f);
+      color: white; padding: 13px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .header h1 { font-size: 0.95rem; font-weight: 700; }
+    .header .src { font-size: 0.7rem; opacity: 0.65; margin-top: 2px; }
+
+    #img-wrap { position: relative; width: 100%; height: 170px; background: #e8f5e9; border-bottom: 1px solid #c8e6c9; overflow: hidden; }
+    #img-preview { width: 100%; height: 100%; object-fit: contain; display: none; }
+    #img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+
+    .no-token-bar {
+      background: #fff3cd; border-bottom: 1px solid #ffc107;
+      padding: 9px 14px; font-size: 0.78rem; text-align: center;
+    }
+    .no-token-bar a { color: #1b4332; font-weight: 700; text-decoration: none; }
+
+    .form { padding: 14px 16px; display: flex; flex-direction: column; gap: 11px; }
+
+    label {
+      font-size: 0.68rem; font-weight: 700; color: #2d6a4f;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      display: block; margin-bottom: 4px;
+    }
+    input, select {
+      width: 100%; padding: 8px 11px;
+      border: 1.5px solid #c8e6c9; border-radius: 8px;
+      font-size: 0.85rem; font-family: inherit; color: #1b4332;
+      background: white; outline: none; transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: #40916c; }
+
+    .row { display: flex; gap: 10px; }
+    .row > div { flex: 1; }
+
+    .check-row {
+      display: flex; align-items: center; gap: 8px;
+      background: white; padding: 9px 12px;
+      border-radius: 8px; border: 1.5px solid #c8e6c9; cursor: pointer;
+    }
+    .check-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #40916c; cursor: pointer; }
+    .check-row span { font-size: 0.84rem; font-weight: 500; }
+
+    .btn-add {
+      background: linear-gradient(135deg, #40916c, #2d6a4f);
+      color: white; border: none; border-radius: 10px;
+      padding: 12px; font-size: 0.92rem; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: opacity 0.2s; width: 100%;
+    }
+    .btn-add:hover { opacity: 0.9; }
+    .btn-add:disabled { background: #b0bec5; cursor: not-allowed; }
+
+    .status {
+      font-size: 0.8rem; font-weight: 600; padding: 9px 12px;
+      border-radius: 8px; text-align: center; display: none;
+    }
+    .status.loading { background: #e3f2fd; color: #1565c0; display: block; }
+    .status.success { background: #d1fae5; color: #065f46; display: block; }
+    .status.error   { background: #fee2e2; color: #b91c1c; display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <span style="font-size:1.4rem">🍄</span>
+    <div>
+      <h1>Add to ShroomLab 3D</h1>
+      <div class="src" id="page-src"></div>
+    </div>
+  </div>
+
+  <div id="no-token-bar" class="no-token-bar" style="display:none">
+    ⚠️ GitHub token not configured. <a id="go-settings" href="#">Open Settings →</a>
+  </div>
+
+  <div id="img-wrap">
+    <div id="img-placeholder">🖼️</div>
+    <img id="img-preview" alt="Product preview">
+  </div>
+
+  <div class="form">
+    <div>
+      <label>Image URL</label>
+      <input type="url" id="img-url" placeholder="https://...">
+    </div>
+
+    <div>
+      <label>Product Title</label>
+      <input type="text" id="title" placeholder="e.g. Articulated Dragon Keychain">
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Category</label>
+        <select id="category"><option value="">Loading…</option></select>
+      </div>
+      <div>
+        <label>Price (₹)</label>
+        <input type="number" id="price" value="299" min="0" style="width:100%">
+      </div>
+    </div>
+
+    <label class="check-row" for="is-new">
+      <input type="checkbox" id="is-new" checked>
+      <span>Mark as <strong>NEW</strong> badge</span>
+    </label>
+
+    <button class="btn-add" id="btn-add">➕ Add to Catalogue</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script src="product_form.js"></script>
+</body>
+</html>

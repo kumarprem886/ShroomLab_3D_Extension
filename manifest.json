@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Add to ShroomLab 3D",
+  "version": "1.0",
+  "description": "Right-click any product image to add it to your ShroomLab 3D catalogue",
+  "permissions": ["contextMenus", "storage"],
+  "host_permissions": [
+    "https://api.github.com/*",
+    "https://raw.githubusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ShroomLab 3D"
+  }
+}
