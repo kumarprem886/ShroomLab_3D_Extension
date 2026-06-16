@@ -30,6 +30,13 @@
     .btn-reset{background:transparent;color:#40916c;
                border:1.5px solid #40916c;margin-top:2px}
     .saved{font-size:.75rem;color:#065f46;font-weight:600;text-align:center;display:none}
+    .site-row{display:flex;gap:6px;align-items:center}
+    .site-row input{flex:1}
+    .btn-visit{width:auto;padding:8px 12px;background:#1b4332;color:#fff;
+               border:none;border-radius:8px;font-size:.78rem;font-weight:600;
+               cursor:pointer;white-space:nowrap;flex-shrink:0}
+    .btn-visit:hover{background:#2d6a4f}
+    .divider{border:none;border-top:1px solid #c8e6c9;margin:2px 0}
   </style>
 </head>
 <body>
@@ -62,6 +69,16 @@
     </div>
 
     <button class="btn-reset" id="btn-reset" style="display:none">🔑 Change Token</button>
+
+    <hr class="divider">
+
+    <div>
+      <label>My Website</label>
+      <div class="site-row">
+        <input type="url" id="site-url" placeholder="https://yoursite.github.io">
+        <button class="btn-visit" id="btn-visit">🌐 Visit</button>
+      </div>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>
