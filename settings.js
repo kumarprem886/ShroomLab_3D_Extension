@@ -19,3 +19,4 @@ async function saveSettings() {
 }
 
 loadSettings();
+document.getElementById('btn-save').addEventListener('click', saveSettings);
