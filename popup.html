@@ -3,44 +3,65 @@
 <head>
   <meta charset="utf-8">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; width: 260px; background: #f0f7f4; color: #1b4332; }
-    .header {
-      background: linear-gradient(135deg, #1b4332, #2d6a4f);
-      color: white; padding: 14px 16px; text-align: center;
-    }
-    .header h1 { font-size: 1rem; font-weight: 700; }
-    .header p  { font-size: 0.72rem; opacity: 0.75; margin-top: 3px; }
-    .body { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
-    .tip {
-      background: white; border-radius: 8px; padding: 11px;
-      font-size: 0.78rem; line-height: 1.55; color: #374151;
-      border-left: 3px solid #40916c;
-    }
-    button {
-      width: 100%; padding: 10px; border: none; border-radius: 8px;
-      font-size: 0.84rem; font-weight: 600; cursor: pointer;
-      font-family: inherit; transition: opacity 0.15s;
-    }
-    button:hover { opacity: 0.88; }
-    .btn-primary { background: #40916c; color: white; }
-    .btn-secondary {
-      background: transparent; color: #40916c;
-      border: 1.5px solid #40916c;
-    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;width:290px;background:#f0f7f4;color:#1b4332}
+    .hdr{background:linear-gradient(135deg,#1b4332,#2d6a4f);color:#fff;
+         padding:14px 16px;text-align:center}
+    .hdr h1{font-size:1rem;font-weight:700}
+    .hdr p{font-size:.72rem;opacity:.72;margin-top:3px}
+    .body{padding:14px;display:flex;flex-direction:column;gap:10px}
+    .ready{background:#d1fae5;border-radius:10px;padding:12px;
+           font-size:.82rem;color:#065f46;font-weight:600;text-align:center;display:none}
+    .tip{background:#fff;border-radius:8px;padding:11px;
+         font-size:.78rem;line-height:1.55;color:#374151;
+         border-left:3px solid #40916c}
+    label{font-size:.68rem;font-weight:700;color:#2d6a4f;
+          text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+    input{width:100%;padding:8px 10px;border:1.5px solid #c8e6c9;
+          border-radius:8px;font-size:.83rem;font-family:inherit;
+          color:#1b4332;background:#fff;outline:none}
+    input:focus{border-color:#40916c}
+    .hint{font-size:.68rem;color:#6b7280;margin-top:3px}
+    .hint a{color:#2d6a4f}
+    button{width:100%;padding:9px;border:none;border-radius:8px;
+           font-size:.84rem;font-weight:600;cursor:pointer;font-family:inherit}
+    .btn-save{background:#40916c;color:#fff}
+    .btn-save:hover{background:#2d6a4f}
+    .btn-reset{background:transparent;color:#40916c;
+               border:1.5px solid #40916c;margin-top:2px}
+    .saved{font-size:.75rem;color:#065f46;font-weight:600;text-align:center;display:none}
   </style>
 </head>
 <body>
-  <div class="header">
+  <div class="hdr">
     <h1>🍄 ShroomLab 3D</h1>
     <p>Product Importer</p>
   </div>
   <div class="body">
-    <div class="tip">
-      <strong>Right-click</strong> any product image on MakerWorld or any site → select <strong>"Add to ShroomLab 3D"</strong>.
+    <div class="ready" id="ready-msg">
+      ✅ Extension is active!<br>
+      <span style="font-weight:400;font-size:.76rem">Right-click any product image to add it.</span>
     </div>
-    <button class="btn-primary" id="btn-manual">➕ Add Product Manually</button>
-    <button class="btn-secondary" id="btn-settings">⚙️ Settings</button>
+
+    <div id="setup-section">
+      <div class="tip" id="tip-text">Enter your GitHub token once to start adding products from any site.</div>
+
+      <div style="margin-top:4px">
+        <label>GitHub Token</label>
+        <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+        <p class="hint"><a href="https://github.com/settings/tokens/new?scopes=repo&description=ShroomLab+Extension" target="_blank">Create token (repo scope) →</a></p>
+      </div>
+
+      <div>
+        <label>Repository</label>
+        <input type="text" id="repo" value="kumarprem886/ShroomLab_3D">
+      </div>
+
+      <button class="btn-save" id="btn-save">💾 Save</button>
+      <div class="saved" id="saved-msg">✅ Saved!</div>
+    </div>
+
+    <button class="btn-reset" id="btn-reset" style="display:none">🔑 Change Token</button>
   </div>
   <script src="popup.js"></script>
 </body>
