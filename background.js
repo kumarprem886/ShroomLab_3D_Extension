@@ -135,7 +135,8 @@ async function pushQueue() {
       `"price":"${p.price}"`,
       `"compare_at":""`,
       `"cat":"${p.cat}"`,
-      p.isNew ? `"isNew":true` : null
+      p.isNew ? `"isNew":true` : null,
+      `"addedAt":${p.addedAt || Date.now()}`
     ].filter(Boolean);
     return parts.join(',') + imgField + '}';
   });

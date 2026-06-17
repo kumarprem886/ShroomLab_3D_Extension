@@ -371,6 +371,7 @@
 
     const product = {
       title, price, cat, isNew,
+      addedAt: Date.now(),
       ...(images.length === 1 ? { image: images[0] } : { image: images[0], images })
     };
 
