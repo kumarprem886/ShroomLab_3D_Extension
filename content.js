@@ -58,13 +58,24 @@
     label{font-size:.6rem;font-weight:700;color:#2d6a4f;
           text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:3px}
 
-    input,select{
+    input{
       width:100%;padding:6px 9px;
       border:1.5px solid #c8e6c9;border-radius:6px;
       font-size:.78rem;font-family:inherit;color:#1b4332;
       background:#fff;outline:none;
     }
-    input:focus,select:focus{border-color:#40916c}
+    input:focus{border-color:#40916c}
+
+    .cat-list{
+      width:100%;max-height:80px;overflow-y:auto;
+      border:1.5px solid #c8e6c9;border-radius:6px;background:#fff;padding:3px 0;
+    }
+    .cat-opt{display:flex;align-items:center;gap:7px;
+             padding:3px 8px;cursor:pointer;font-size:.76rem;color:#1b4332;
+             user-select:none}
+    .cat-opt:hover{background:#e8f5e9}
+    .cat-opt input[type=checkbox]{width:13px;height:13px;accent-color:#40916c;
+             margin:0;cursor:pointer;flex-shrink:0}
 
     /* images section */
     .chips{display:flex;flex-wrap:wrap;gap:4px;min-height:0;margin-bottom:4px}
@@ -158,8 +169,8 @@
 
       <div class="row">
         <div>
-          <label>Category <span style="opacity:.5;font-weight:400;text-transform:none">(multi OK)</span></label>
-          <select id="cat" multiple size="3" style="height:64px;font-size:.75rem"><option>Loading…</option></select>
+          <label>Category <span style="opacity:.5;font-weight:400;text-transform:none">(tick all that apply)</span></label>
+          <div class="cat-list" id="cat"><div class="cat-opt" style="opacity:.5">Loading…</div></div>
         </div>
         <div>
           <label>Price (₹)</label>
@@ -319,16 +330,19 @@
 
   // ── Load categories ────────────────────────────────────────────────────
   chrome.runtime.sendMessage({ type: 'GET_CATEGORIES' }, cats => {
-    const sel = $('cat');
-    sel.innerHTML = cats?.length
-      ? cats.map(([k, v]) => `<option value="${k}">${v}</option>`).join('')
-      : '<option value="custom">custom</option>';
-    sel.innerHTML += '<option value="__new__">＋ New category…</option>';
-  });
+    const list = $('cat');
+    const options = cats?.length ? cats : [['custom', 'custom']];
+    list.innerHTML = options.map(([k, v]) =>
+      `<label class="cat-opt"><input type="checkbox" value="${k}"> ${v}</label>`
+    ).join('') + `<label class="cat-opt"><input type="checkbox" value="__new__"> ＋ New category…</label>`;
 
-  $('cat').addEventListener('change', () => {
-    const vals = [...$('cat').selectedOptions].map(o => o.value);
-    $('ncf').classList.toggle('show', vals.includes('__new__'));
+    list.querySelectorAll('input[type=checkbox]').forEach(cb =>
+      cb.addEventListener('change', () => {
+        const newChecked = [...list.querySelectorAll('input[type=checkbox]')]
+          .some(c => c.value === '__new__' && c.checked);
+        $('ncf').classList.toggle('show', newChecked);
+      })
+    );
   });
 
   $('ncc').addEventListener('input',  () => { $('ncct').value = $('ncc').value; });
@@ -341,7 +355,7 @@
     const title = $('ttl').value.trim();
     const isNew = $('isnew').checked;
     const price = $('price').value || '299';
-    let selectedVals = [...$('cat').selectedOptions].map(o => o.value);
+    let selectedVals = [...$('cat').querySelectorAll('input[type=checkbox]:checked')].map(c => c.value);
 
     if (!title)               { setStatus('error', '❌ Title is required.'); return; }
     if (!images.length)       { setStatus('error', '❌ Add at least one image.'); return; }
