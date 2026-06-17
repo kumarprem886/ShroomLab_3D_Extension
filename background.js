@@ -139,8 +139,9 @@ async function addProduct(p) {
       await ghPut('products.js', updated, sha, `Add: ${p.title}`, repo, branch, headers);
       return;
     } catch (e) {
-      if (attempt === 2 || !e.message.toLowerCase().includes('sha')) throw e;
-      // SHA mismatch — file was updated concurrently, re-fetch and retry
+      if (attempt === 2 || e.status !== 409) throw e;
+      // 409 = SHA mismatch — wait for GitHub to propagate, then re-fetch and retry
+      await new Promise(r => setTimeout(r, 800));
     }
   }
 }
@@ -166,7 +167,12 @@ async function ghPut(filename, content, sha, message, repo, branch, headers) {
       body: JSON.stringify({ message, content: toBase64(content), sha, branch })
     }
   );
-  if (!res.ok) throw new Error((await res.json()).message);
+  if (!res.ok) {
+    const body = await res.json();
+    const err = new Error(body.message || `HTTP ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
 }
 
 // ── Misc helpers ───────────────────────────────────────────────────────
