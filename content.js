@@ -192,7 +192,7 @@
         <input type="checkbox" id="isnew" checked>
         Mark as <strong style="margin-left:2px">NEW</strong>
       </label>
-      <button class="btn" id="addbtn">➕ Add to Catalogue</button>
+      <button class="btn" id="addbtn">📋 Add to Queue</button>
       <div class="st" id="st"></div>
     </div>
   </div>`;
@@ -374,14 +374,14 @@
       ...(images.length === 1 ? { image: images[0] } : { image: images[0], images })
     };
 
-    chrome.runtime.sendMessage({ type: 'ADD_PRODUCT', product }, res => {
-      if (res?.ok) {
-        setStatus('success', `✅ "${title}" added! Live in ~1 min.`);
-        setTimeout(() => host.remove(), 3000);
-      } else {
-        setStatus('error', '❌ ' + (res?.error || 'Unknown error'));
-        $('addbtn').disabled = false;
-      }
+    // Save to local queue — push to GitHub from the popup when ready
+    chrome.storage.local.get('shroomlab_queue', d => {
+      const queue = d.shroomlab_queue || [];
+      queue.push(product);
+      chrome.storage.local.set({ shroomlab_queue: queue }, () => {
+        setStatus('success', `📋 Queued! (${queue.length} waiting — push from 🍄 popup)`);
+        setTimeout(() => host.remove(), 2500);
+      });
     });
   });
 

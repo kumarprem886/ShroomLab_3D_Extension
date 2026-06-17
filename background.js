@@ -33,9 +33,9 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     fetchCategories().then(sendResponse).catch(() => sendResponse([]));
     return true;
   }
-  if (msg.type === 'ADD_PRODUCT') {
-    addProduct(msg.product).then(() => sendResponse({ ok: true }))
-                           .catch(e => sendResponse({ ok: false, error: e.message }));
+  if (msg.type === 'PUSH_QUEUE') {
+    pushQueue().then(count => sendResponse({ ok: true, count }))
+               .catch(e => sendResponse({ ok: false, error: e.message }));
     return true;
   }
   if (msg.type === 'CREATE_CATEGORY') {
@@ -104,6 +104,47 @@ async function createCategory({ key, label, color }) {
 
     await ghPut(filename, updated, sha, `Add category: ${label}`, repo, branch, headers);
   }
+}
+
+// ── Push entire queue in one commit ───────────────────────────────────
+async function pushQueue() {
+  const s = await getSettings();
+  if (!s.token) throw new Error('No GitHub token — click the 🍄 icon to set it up.');
+
+  const queue = await new Promise(resolve =>
+    chrome.storage.local.get('shroomlab_queue', d => resolve(d.shroomlab_queue || []))
+  );
+  if (!queue.length) throw new Error('Queue is empty.');
+
+  const repo    = s.repo   || DEFAULT_REPO;
+  const branch  = s.branch || DEFAULT_BRANCH;
+  const headers = {
+    'Authorization': `token ${s.token}`,
+    'Accept':        'application/vnd.github+json',
+    'Content-Type':  'application/json'
+  };
+
+  const { sha, content } = await ghGet('products.js', repo, branch, headers);
+
+  const entries = queue.map(p => {
+    const imgField = p.images && p.images.length > 1
+      ? `,"image":${JSON.stringify(p.images[0])},"images":${JSON.stringify(p.images)}`
+      : `,"image":${JSON.stringify(p.image)}`;
+    const parts = [
+      `  {"title":${JSON.stringify(p.title)}`,
+      `"price":"${p.price}"`,
+      `"compare_at":""`,
+      `"cat":"${p.cat}"`,
+      p.isNew ? `"isNew":true` : null
+    ].filter(Boolean);
+    return parts.join(',') + imgField + '}';
+  });
+
+  const updated = content.replace(/\n?\];\s*$/, entries.map(e => `,\n${e}`).join('') + '\n];');
+  await ghPut('products.js', updated, sha, `Add ${queue.length} products`, repo, branch, headers);
+
+  await new Promise(resolve => chrome.storage.local.remove('shroomlab_queue', resolve));
+  return queue.length;
 }
 
 // ── Push new product to products.js (retries on SHA mismatch) ────────

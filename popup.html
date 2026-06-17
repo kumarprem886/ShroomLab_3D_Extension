@@ -6,69 +6,111 @@
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Segoe UI',sans-serif;width:290px;background:#f0f7f4;color:#1b4332}
     .hdr{background:linear-gradient(135deg,#1b4332,#2d6a4f);color:#fff;
-         padding:14px 16px;text-align:center}
-    .hdr h1{font-size:1rem;font-weight:700}
-    .hdr p{font-size:.72rem;opacity:.72;margin-top:3px}
-    .body{padding:14px;display:flex;flex-direction:column;gap:10px}
-    .ready{background:#d1fae5;border-radius:10px;padding:12px;
-           font-size:.82rem;color:#065f46;font-weight:600;text-align:center;display:none}
-    .tip{background:#fff;border-radius:8px;padding:11px;
-         font-size:.78rem;line-height:1.55;color:#374151;
-         border-left:3px solid #40916c}
-    label{font-size:.68rem;font-weight:700;color:#2d6a4f;
-          text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
-    input{width:100%;padding:8px 10px;border:1.5px solid #c8e6c9;
-          border-radius:8px;font-size:.83rem;font-family:inherit;
+         padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+    .hdr-l h1{font-size:.95rem;font-weight:700}
+    .hdr-l p{font-size:.68rem;opacity:.7;margin-top:2px}
+    .badge{background:rgba(255,255,255,.2);border-radius:10px;
+           padding:2px 8px;font-size:.75rem;font-weight:700;min-width:22px;text-align:center}
+    .body{padding:12px;display:flex;flex-direction:column;gap:9px}
+
+    /* setup */
+    .tip{background:#fff;border-radius:8px;padding:10px;
+         font-size:.76rem;line-height:1.5;color:#374151;border-left:3px solid #40916c}
+    label{font-size:.65rem;font-weight:700;color:#2d6a4f;
+          text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:3px}
+    input{width:100%;padding:7px 10px;border:1.5px solid #c8e6c9;
+          border-radius:7px;font-size:.82rem;font-family:inherit;
           color:#1b4332;background:#fff;outline:none}
     input:focus{border-color:#40916c}
-    .hint{font-size:.68rem;color:#6b7280;margin-top:3px}
+    .hint{font-size:.65rem;color:#6b7280;margin-top:3px}
     .hint a{color:#2d6a4f}
-    button{width:100%;padding:9px;border:none;border-radius:8px;
-           font-size:.84rem;font-weight:600;cursor:pointer;font-family:inherit}
+    button{width:100%;padding:8px;border:none;border-radius:7px;
+           font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit}
     .btn-save{background:#40916c;color:#fff}
     .btn-save:hover{background:#2d6a4f}
-    .btn-reset{background:transparent;color:#40916c;
-               border:1.5px solid #40916c;margin-top:2px}
-    .saved{font-size:.75rem;color:#065f46;font-weight:600;text-align:center;display:none}
+    .btn-reset{background:transparent;color:#40916c;border:1.5px solid #40916c}
+    .saved{font-size:.72rem;color:#065f46;font-weight:600;text-align:center;display:none}
+
+    /* queue */
+    .queue-box{background:#fff;border-radius:9px;border:1.5px solid #c8e6c9;overflow:hidden}
+    .queue-hdr{display:flex;align-items:center;justify-content:space-between;
+               padding:8px 11px;border-bottom:1px solid #e8f5e9}
+    .queue-hdr span{font-size:.75rem;font-weight:700;color:#2d6a4f}
+    .btn-clear{width:auto;padding:3px 9px;background:transparent;color:#9ca3af;
+               border:1px solid #e5e7eb;border-radius:5px;font-size:.68rem;cursor:pointer}
+    .btn-clear:hover{color:#b91c1c;border-color:#fca5a5}
+    .queue-list{max-height:140px;overflow-y:auto;padding:6px 0}
+    .q-item{display:flex;align-items:center;gap:8px;padding:4px 11px;font-size:.75rem}
+    .q-item-img{width:28px;height:28px;object-fit:cover;border-radius:4px;
+                background:#e8f5e9;flex-shrink:0}
+    .q-item-info{flex:1;min-width:0}
+    .q-item-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+                  font-weight:600;color:#1b4332}
+    .q-item-cat{font-size:.65rem;color:#6b7280;margin-top:1px}
+    .q-empty{padding:12px;text-align:center;font-size:.76rem;color:#9ca3af}
+    .btn-push{background:linear-gradient(135deg,#40916c,#2d6a4f);color:#fff;
+              border-radius:8px;padding:10px;font-size:.86rem;font-weight:700}
+    .btn-push:hover{opacity:.88}
+    .btn-push:disabled{background:#b0bec5;cursor:not-allowed}
+    .push-status{font-size:.74rem;font-weight:600;padding:7px 10px;
+                 border-radius:7px;text-align:center;display:none}
+    .push-status.loading{background:#e3f2fd;color:#1565c0;display:block}
+    .push-status.success{background:#d1fae5;color:#065f46;display:block}
+    .push-status.error{background:#fee2e2;color:#b91c1c;display:block}
+
+    /* site URL */
     .site-row{display:flex;gap:6px;align-items:center}
     .site-row input{flex:1}
-    .btn-visit{width:auto;padding:8px 12px;background:#1b4332;color:#fff;
-               border:none;border-radius:8px;font-size:.78rem;font-weight:600;
+    .btn-visit{width:auto;padding:7px 11px;background:#1b4332;color:#fff;
+               border-radius:7px;font-size:.76rem;font-weight:600;
                cursor:pointer;white-space:nowrap;flex-shrink:0}
     .btn-visit:hover{background:#2d6a4f}
-    .divider{border:none;border-top:1px solid #c8e6c9;margin:2px 0}
+    .divider{border:none;border-top:1px solid #c8e6c9;margin:1px 0}
   </style>
 </head>
 <body>
   <div class="hdr">
-    <h1>🍄 ShroomLab 3D</h1>
-    <p>Product Importer</p>
-  </div>
-  <div class="body">
-    <div class="ready" id="ready-msg">
-      ✅ Extension is active!<br>
-      <span style="font-weight:400;font-size:.76rem">Right-click any product image to add it.</span>
+    <div class="hdr-l">
+      <h1>🍄 ShroomLab 3D</h1>
+      <p>Product Importer</p>
     </div>
+    <div class="badge" id="hdr-badge">0</div>
+  </div>
 
+  <div class="body">
+    <!-- Setup (shown when no token) -->
     <div id="setup-section">
-      <div class="tip" id="tip-text">Enter your GitHub token once to start adding products from any site.</div>
-
-      <div style="margin-top:4px">
+      <div class="tip">Enter your GitHub token once to start queuing products.</div>
+      <div style="margin-top:2px">
         <label>GitHub Token</label>
         <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
         <p class="hint"><a href="https://github.com/settings/tokens/new?scopes=repo&description=ShroomLab+Extension" target="_blank">Create token (repo scope) →</a></p>
       </div>
-
       <div>
         <label>Repository</label>
         <input type="text" id="repo" value="kumarprem886/ShroomLab_3D">
       </div>
-
       <button class="btn-save" id="btn-save">💾 Save</button>
       <div class="saved" id="saved-msg">✅ Saved!</div>
     </div>
 
     <button class="btn-reset" id="btn-reset" style="display:none">🔑 Change Token</button>
+
+    <hr class="divider">
+
+    <!-- Queue -->
+    <div class="queue-box">
+      <div class="queue-hdr">
+        <span id="queue-label">Queue</span>
+        <button class="btn-clear" id="btn-clear">Clear all</button>
+      </div>
+      <div class="queue-list" id="queue-list">
+        <div class="q-empty">No products queued yet.<br>Right-click images to add.</div>
+      </div>
+    </div>
+
+    <button class="btn-push" id="btn-push" disabled>🚀 Push to GitHub</button>
+    <div class="push-status" id="push-status"></div>
 
     <hr class="divider">
 
