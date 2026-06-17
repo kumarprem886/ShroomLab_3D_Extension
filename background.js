@@ -106,7 +106,7 @@ async function createCategory({ key, label, color }) {
   }
 }
 
-// ── Push new product to products.js ───────────────────────────────────
+// ── Push new product to products.js (retries on SHA mismatch) ────────
 async function addProduct(p) {
   const s = await getSettings();
   if (!s.token) throw new Error('No GitHub token — click the 🍄 icon to set it up.');
@@ -119,19 +119,30 @@ async function addProduct(p) {
     'Content-Type':  'application/json'
   };
 
-  const { sha, content } = await ghGet('products.js', repo, branch, headers);
+  const imgField = p.images && p.images.length > 1
+    ? `,"image":${JSON.stringify(p.images[0])},"images":${JSON.stringify(p.images)}`
+    : `,"image":${JSON.stringify(p.image)}`;
 
   const parts = [
     `  {"title":${JSON.stringify(p.title)}`,
     `"price":"${p.price}"`,
     `"compare_at":""`,
     `"cat":"${p.cat}"`,
-    p.isNew ? `"isNew":true` : null,
-    `"image":${JSON.stringify(p.image)}}`
+    p.isNew ? `"isNew":true` : null
   ].filter(Boolean);
+  const entry = parts.join(',') + imgField + '}';
 
-  const updated = content.replace(/\n?\];\s*$/, `,\n${parts.join(',')}\n];`);
-  await ghPut('products.js', updated, sha, `Add: ${p.title}`, repo, branch, headers);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { sha, content } = await ghGet('products.js', repo, branch, headers);
+    const updated = content.replace(/\n?\];\s*$/, `,\n${entry}\n];`);
+    try {
+      await ghPut('products.js', updated, sha, `Add: ${p.title}`, repo, branch, headers);
+      return;
+    } catch (e) {
+      if (attempt === 2 || !e.message.toLowerCase().includes('sha')) throw e;
+      // SHA mismatch — file was updated concurrently, re-fetch and retry
+    }
+  }
 }
 
 // ── GitHub API helpers ─────────────────────────────────────────────────
