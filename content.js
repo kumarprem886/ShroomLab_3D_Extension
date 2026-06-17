@@ -158,8 +158,8 @@
 
       <div class="row">
         <div>
-          <label>Category</label>
-          <select id="cat"><option>Loading…</option></select>
+          <label>Category <span style="opacity:.5;font-weight:400;text-transform:none">(multi OK)</span></label>
+          <select id="cat" multiple size="3" style="height:64px;font-size:.75rem"><option>Loading…</option></select>
         </div>
         <div>
           <label>Price (₹)</label>
@@ -327,7 +327,8 @@
   });
 
   $('cat').addEventListener('change', () => {
-    $('ncf').classList.toggle('show', $('cat').value === '__new__');
+    const vals = [...$('cat').selectedOptions].map(o => o.value);
+    $('ncf').classList.toggle('show', vals.includes('__new__'));
   });
 
   $('ncc').addEventListener('input',  () => { $('ncct').value = $('ncc').value; });
@@ -340,12 +341,14 @@
     const title = $('ttl').value.trim();
     const isNew = $('isnew').checked;
     const price = $('price').value || '299';
-    let   cat   = $('cat').value;
+    let selectedVals = [...$('cat').selectedOptions].map(o => o.value);
 
-    if (!title)         { setStatus('error', '❌ Title is required.'); return; }
-    if (!images.length) { setStatus('error', '❌ Add at least one image.'); return; }
+    if (!title)               { setStatus('error', '❌ Title is required.'); return; }
+    if (!images.length)       { setStatus('error', '❌ Add at least one image.'); return; }
+    if (!selectedVals.length) { setStatus('error', '❌ Select at least one category.'); return; }
 
-    if (cat === '__new__') {
+    // Handle new category creation
+    if (selectedVals.includes('__new__')) {
       const key   = $('nck').value.trim().replace(/\s+/g, '_').replace(/[^a-z0-9_]/gi, '');
       const label = $('ncl').value.trim();
       const color = $('ncct').value.trim() || $('ncc').value;
@@ -362,15 +365,20 @@
         $('addbtn').disabled = false;
         return;
       }
-      cat = key;
-      setStatus('loading', '🚀 Pushing product…');
-    } else {
-      $('addbtn').disabled = true;
-      setStatus('loading', '🚀 Pushing to GitHub…');
+      selectedVals = selectedVals.filter(v => v !== '__new__');
+      selectedVals.push(key);
     }
 
+    $('addbtn').disabled = true;
+    setStatus('loading', '📋 Adding to queue…');
+
+    // cat = primary, cats = all (only store cats array when more than one)
+    const cats = selectedVals;
     const product = {
-      title, price, cat, isNew,
+      title, price,
+      cat: cats[0],
+      ...(cats.length > 1 ? { cats } : {}),
+      isNew,
       addedAt: Date.now(),
       ...(images.length === 1 ? { image: images[0] } : { image: images[0], images })
     };

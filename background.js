@@ -130,15 +130,17 @@ async function pushQueue() {
     const imgField = p.images && p.images.length > 1
       ? `,"image":${JSON.stringify(p.images[0])},"images":${JSON.stringify(p.images)}`
       : `,"image":${JSON.stringify(p.image)}`;
+    const catField = p.cats && p.cats.length > 1
+      ? `,"cat":${JSON.stringify(p.cats[0])},"cats":${JSON.stringify(p.cats)}`
+      : `,"cat":${JSON.stringify(p.cat)}`;
     const parts = [
       `  {"title":${JSON.stringify(p.title)}`,
       `"price":"${p.price}"`,
-      `"compare_at":""`,
-      `"cat":"${p.cat}"`,
-      p.isNew ? `"isNew":true` : null,
-      `"addedAt":${p.addedAt || Date.now()}`
-    ].filter(Boolean);
-    return parts.join(',') + imgField + '}';
+      `"compare_at":""`
+    ];
+    if (p.isNew) parts.push(`"isNew":true`);
+    parts.push(`"addedAt":${p.addedAt || Date.now()}`);
+    return parts.join(',') + catField + imgField + '}';
   });
 
   const updated = content.replace(/\n?\];\s*$/, entries.map(e => `,\n${e}`).join('') + '\n];');
